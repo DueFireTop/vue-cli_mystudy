@@ -64,7 +64,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## ref属性
 
-`代码示例`：  [02_src_ref 属性](02_src_ref 属性) 
+`代码示例`：  [02_src_ref 属性](02_src_ref属性) 
 
 1. 被用来给元素或子组件注册引用信息（id的替代者）
 2. 应用在html标签上获取的是真实DOM元素，应用在组件标签上是组件实例对象（vc）
