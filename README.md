@@ -1,22 +1,22 @@
 # test_vue
 
 ## Project setup
-```
+```bash
 npm install
 ```
 
 ### Compiles and hot-reloads for development
-```
+```bash
 npm run serve
 ```
 
 ### Compiles and minifies for production
-```
+```bash
 npm run build
 ```
 
 ### Lints and fixes files
-```
+```bash
 npm run lint
 ```
 
@@ -27,7 +27,11 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 # 笔记
 
+教程见：[尚硅谷Vue2.0+Vue3.0全套教程丨vuejs从入门到精通_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1Zy4y1K7SH/)
+
 使用步骤：将示例代码文件名改为`src`，运行`npm run serve`即可。
+
+静态页面见： [copys](copys) 
 
 ## 脚手架文件结构
 
@@ -523,6 +527,8 @@ module.exports = {
 
 ## Vuex
 
+`示例代码`： [23_src求和案例_纯vue版](23_src_求和案例_纯vue版)  [24_src求和案例_vuex版](24_src_求和案例_vuex版)  [25_src求和案例_mapState-mapGetter](25_src_求和案例_mapState-mapGetter)  [26_src求和案例_mapActions-mapMutations](26_src_求和案例_mapActions-mapMutations)  [27_src_多组件共享数据](27_src_多组件共享数据)  [28_src_vuex模块化](28_src_vuex模块化) 
+
 <div><img src="./README.assets/vuex.png" alt="vuex" style="border:2px solid gray; text-align:center; vertical-align: middle" /></div>
 
 > **形象化vuex**：
@@ -819,9 +825,632 @@ npm i vuex@3 //注意，vue2中要用vuex3，vue3中要用vuex4
 
 ## 路由
 
+pages中存放路由组件
+
+components中存放一般组件
+
+1. 理解： 一个路由（route）就是一组映射关系（key - value），多个路由需要路由器（router）进行管理。
+2. 前端路由：key是路径，value是组件。
+
+### 1.基本使用
+
+`示例代码`： [29_src_路由的基本使用](29_src_路由的基本使用) 
+
+1. 安装vue-router，命令：```npm i vue-router```
+
+2. 应用插件：```Vue.use(VueRouter)```
+
+3. 编写router配置项:
+
+   ```js
+   //引入VueRouter
+   import VueRouter from 'vue-router'
+   //引入Luyou 组件
+   import About from '../components/About'
+   import Home from '../components/Home'
+   
+   //创建router实例对象，去管理一组一组的路由规则
+   const router = new VueRouter({
+   	routes:[
+   		{
+   			path:'/about',
+   			component:About
+   		},
+   		{
+   			path:'/home',
+   			component:Home
+   		}
+   	]
+   })
+   
+   //暴露router
+   export default router
+   ```
+
+4. 实现切换（active-class可配置高亮样式）
+
+   ```vue
+   <router-link active-class="active" to="/about">About</router-link>
+   ```
+
+5. 指定展示位置
+
+   ```vue
+   <router-view></router-view>
+   ```
+
+### 2.几个注意点
+
+1. 路由组件通常存放在```pages```文件夹，一般组件通常存放在```components```文件夹。
+2. 通过切换，“隐藏”了的路由组件，默认是被销毁掉的，需要的时候再去挂载。
+3. 每个组件都有自己的```$route```属性，里面存储着自己的路由信息。
+4. 整个应用只有一个router，可以通过组件的```$router```属性获取到。
+
+### 3.多级路由（嵌套路由）
+
+`示例代码`： [30_src_多级路由（嵌套路由）](30_src_多级路由（嵌套路由）) 
+
+1. 配置路由规则，使用children配置项：
+
+   ```js
+   routes:[
+   	{
+   		path:'/about',
+   		component:About,
+   	},
+   	{
+   		path:'/home',
+   		component:Home,
+   		children:[ //通过children配置子级路由
+   			{
+   				path:'news', //此处一定不要写：/news
+   				component:News
+   			},
+   			{
+   				path:'message',//此处一定不要写：/message
+   				component:Message
+   			}
+   		]
+   	}
+   ]
+   ```
+
+2. 跳转（要写完整路径）：
+
+   ```vue
+   <router-link to="/home/news">News</router-link>
+   ```
+
+### 4.路由的query参数
+
+`示例代码`： [31_src_路由的query参数](31_src_路由的query参数) 
+
+1. 传递参数
+
+   ```vue
+   <!-- 跳转并携带query参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail?id=666&title=你好">跳转</router-link>
+   				
+   <!-- 跳转并携带query参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		path:'/home/message/detail',
+   		query:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+2. 接收参数：
+
+   ```js
+   $route.query.id
+   $route.query.title
+   ```
+
+### 5.命名路由
+
+`示例代码`： [32_src_命名路由](32_src_命名路由) 
+
+1. 作用：可以简化路由的跳转。
+
+2. 如何使用
+
+   1. 给路由命名：
+
+      ```js
+      {
+      	path:'/demo',
+      	component:Demo,
+      	children:[
+      		{
+      			path:'test',
+      			component:Test,
+      			children:[
+      				{
+                            name:'hello' //给路由命名
+      					path:'welcome',
+      					component:Hello,
+      				}
+      			]
+      		}
+      	]
+      }
+      ```
+
+   2. 简化跳转：
+
+      ```vue
+      <!--简化前，需要写完整的路径 -->
+      <router-link to="/demo/test/welcome">跳转</router-link>
+      
+      <!--简化后，直接通过名字跳转 -->
+      <router-link :to="{name:'hello'}">跳转</router-link>
+      
+      <!--简化写法配合传递参数 -->
+      <router-link 
+      	:to="{
+      		name:'hello',
+      		query:{
+      		   id:666,
+                  title:'你好'
+      		}
+      	}"
+      >跳转</router-link>
+      ```
+
+### 6.路由的params参数
+
+`示例代码`： [33_src_路由的params参数](33_src_路由的params参数) 
+
+1. 配置路由，声明接收params参数
+
+   ```js
+   {
+   	path:'/home',
+   	component:Home,
+   	children:[
+   		{
+   			path:'news',
+   			component:News
+   		},
+   		{
+   			component:Message,
+   			children:[
+   				{
+   					name:'xiangqing',
+   					path:'detail/:id/:title', //使用占位符声明接收params参数
+   					component:Detail
+   				}
+   			]
+   		}
+   	]
+   }
+   ```
+
+2. 传递参数
+
+   ```vue
+   <!-- 跳转并携带params参数，to的字符串写法 -->
+   <router-link :to="/home/message/detail/666/你好">跳转</router-link>
+   				
+   <!-- 跳转并携带params参数，to的对象写法 -->
+   <router-link 
+   	:to="{
+   		name:'xiangqing',
+   		params:{
+   		   id:666,
+               title:'你好'
+   		}
+   	}"
+   >跳转</router-link>
+   ```
+
+   > 特别注意：路由携带params参数时，若使用to的对象写法，则不能使用path配置项，必须使用name配置！
+
+3. 接收参数：
+
+   ```js
+   $route.params.id
+   $route.params.title
+   ```
+
+### 7.路由的props配置
+
+`示例代码`： [34_src_路由的props写法](34_src_路由的props写法) 
+
+​	作用：让路由组件更方便的收到参数
+
+```js
+{
+	name:'xiangqing',
+	path:'detail/:id',
+	component:Detail,
+
+	//第一种写法：props值为对象，该对象中所有的key-value的组合最终都会通过props传给Detail组件
+	// props:{a:900}
+
+	//第二种写法：props值为布尔值，布尔值为true，则把路由收到的所有params参数通过props传给Detail组件
+	// props:true
+	
+	//第三种写法：props值为函数，该函数返回的对象中每一组key-value都会通过props传给Detail组件
+	props(route){
+		return {
+			id:route.query.id,
+			title:route.query.title
+		}
+	}
+}
+```
 
 
+### 8.```<router-link>```的replace属性
 
+1. 作用：控制路由跳转时操作浏览器历史记录的模式
+2. 浏览器的历史记录有两种写入方式：分别为```push```和```replace```，```push```是追加历史记录，```replace```是替换当前记录。路由跳转时候默认为```push```
+3. 如何开启```replace```模式：```<router-link replace .......>News</router-link>```
+
+
+### 9.编程式路由导航
+
+1. 作用：不借助```<router-link> ```实现路由跳转，让路由跳转更加灵活
+
+2. 具体编码：
+
+   ```js
+   //$router的两个API
+   this.$router.push({
+   	name:'xiangqing',
+   		params:{
+   			id:xxx,
+   			title:xxx
+   		}
+   })
+   
+   this.$router.replace({
+   	name:'xiangqing',
+   		params:{
+   			id:xxx,
+   			title:xxx
+   		}
+   })
+   this.$router.forward() //前进
+   this.$router.back() //后退
+   this.$router.go() //可前进也可后退 参数是number类型(正数为前进的步数,负数为后退的部署)
+   ```
+
+### 10.缓存路由组件
+
+`示例代码`： [35_src_缓存路由组件](35_src_缓存路由组件) 
+
+1. 作用：让不展示的路由组件保持挂载，不被销毁。
+
+2. 具体编码：
+
+   ```vue
+   <keep-alive include="News"> 
+       <router-view></router-view>
+   </keep-alive>
+   ```
+
+### 11.两个新的生命周期钩子
+
+`示例代码`： [36_src_两个生命周期钩子](36_src_两个生命周期钩子) 
+
+1. 作用：路由组件所独有的两个钩子，用于捕获路由组件的激活状态。
+2. 具体名字：
+   1. ```activated```路由组件被激活时触发。
+   2. ```deactivated```路由组件失活时触发。
+
+### 12.路由守卫
+
+`示例代码`： [37_src_全局路由守卫（前置）](37_src_全局路由守卫（前置）)  [38_src_全局路由守卫（后置）](38_src_全局路由守卫（后置）)  [39_src_组件内路由守卫](39_src_组件内路由守卫) 
+
+1. 作用：对路由进行权限控制
+
+2. 分类：全局守卫、独享守卫、组件内守卫
+
+3. 全局守卫:
+
+   ```js
+   //全局前置守卫：初始化时执行、每次路由切换前执行
+   router.beforeEach((to,from,next)=>{
+   	console.log('beforeEach',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){ //权限控制的具体规则
+   			next() //放行
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next() //放行
+   	}
+   })
+   
+   //全局后置守卫：初始化时执行、每次路由切换后执行
+   router.afterEach((to,from)=>{
+   	console.log('afterEach',to,from)
+   	if(to.meta.title){ 
+   		document.title = to.meta.title //修改网页的title
+   	}else{
+   		document.title = 'vue_test'
+   	}
+   })
+   ```
+
+
+4. 独享守卫:
+
+   ```js
+   beforeEnter(to,from,next){
+   	console.log('beforeEnter',to,from)
+   	if(to.meta.isAuth){ //判断当前路由是否需要进行权限控制
+   		if(localStorage.getItem('school') === 'atguigu'){
+   			next()
+   		}else{
+   			alert('暂无权限查看')
+   			// next({name:'guanyu'})
+   		}
+   	}else{
+   		next()
+   	}
+   }
+   ```
+
+5. 组件内守卫：
+
+   ```js
+   //进入守卫：通过路由规则，进入该组件时被调用
+   beforeRouteEnter (to, from, next) {
+   },
+   //离开守卫：通过路由规则，离开该组件时被调用
+   beforeRouteLeave (to, from, next) {
+   }
+   ```
+
+### 13.路由器的两种工作模式
+
+
+1. 对于一个url来说，什么是hash值？—— #及其后面的内容就是hash值。
+2. hash值不会包含在 HTTP 请求中，即：hash值不会带给服务器。
+3. hash模式：
+   1. 地址中永远带着#号，不美观 。
+   2. 若以后将地址通过第三方手机app分享，若app校验严格，则地址会被标记为不合法。
+   3. 兼容性较好。
+4. history模式：
+   1. 地址干净，美观 。
+   2. 兼容性和hash模式相比略差。
+   3. 应用部署上线时需要后端人员支持，解决刷新页面服务端404的问题
+
+## 开启微型服务器示例
+
+### 0. 打包vue项目
+
+```bash
+npm run build
+```
+
+生成文件夹：`dist`，文件内部结构如下：
+
+```
+dist[
+	css[
+		xxx.css
+	],
+	js[
+		xxx.js,
+		sss.js,
+		ddd.js,
+		aaa.map
+	],
+	qqq.ico,
+	index.html
+]
+```
+
+此时打开的html是空白页，需要借助服务器打开。
+
+### 1. 创建文件夹 demo
+
+```bash
+npm init
+```
+
+```bash
+package name: (demo)  test_server //这里填入服务器名称，之后一路回车
+```
+
+`npm init` 是 Node.js 的包管理工具 npm (Node Package Manager) 提供的一个命令，用于初始化一个新的 **`Node.js`** 项目。当你在一个新的目录中运行 `npm init` 命令时，它会引导你通过一系列的问题来创建一个 `package.json` 文件。这个文件包含了项目的元数据，比如：
+
+- 名称 (`name`)：项目的名字。
+- 版本 (`version`)：项目的当前版本号，默认为 "1.0.0"。
+- 描述 (`description`)：项目的简短描述。
+- 入口文件 (`entry point`)：默认是 `index.js`，这是项目启动时执行的第一个文件。
+- 关键字 (`keywords`)：帮助其他人找到你的项目的标签。
+- 作者 (`author`)：项目作者的信息。
+- 许可证 (`license`)：项目使用的许可证类型，默认为 "ISC"。
+- 仓库 (`repository`)：项目的 Git 仓库 URL。
+- 主要文件 (`main`)：项目的主文件路径。
+- 脚本 (`scripts`)：定义了可以运行的脚本命令。
+- 依赖项 (`dependencies`)：项目运行时所需的其他 npm 包。
+- 开发依赖项 (`devDependencies`)：仅用于开发过程中的 npm 包。
+
+你可以根据提示输入这些信息，也可以接受默认值或者跳过某些字段。完成后，npm 会在当前目录下生成一个 `package.json` 文件。这个文件对于项目的管理和发布非常重要，因为它不仅记录了项目的元数据，还记录了项目所需的所有依赖及其版本信息，这有助于确保任何安装此项目的人都能获得正确的依赖关系。
+
+一旦有了 `package.json` 文件，你可以使用 `npm install` 命令来添加依赖项，使用 `npm publish` 发布你的包到 npm registry，以及其他许多 npm 提供的功能。
+
+​	![image-20240912092810057](./README.assets/image-20240912092810057.png)
+
+### 2. 安装 express
+
+```bash
+npm i express
+```
+
+1. **安装依赖**：
+
+   - `npm` 会从 npm registry 下载最新版本的 Express，并将其放置在项目的 `node_modules` 目录中。
+
+2. **更新 `package.json`**：
+
+   - ```
+     npm
+     ```
+
+      
+
+     会在
+
+      
+
+     ```
+     package.json
+     ```
+
+      
+
+     文件中添加或更新一条记录，例如：
+
+     ```
+     json"dependencies": {
+       "express": "^4.17.1"
+     }
+     ```
+
+3. **生成 `package-lock.json`**：
+
+   - `npm` 还会生成或更新 `package-lock.json` 文件，记录具体的依赖版本和安装细节，以确保每次安装都是一致的。
+
+**常见选项**
+
+- **`--save`**：
+  - 默认情况下，`npm install` 已经包含了 `--save` 选项，因此无需手动指定。
+  - 如果不希望保存到 `package.json`，可以使用 `npm install --no-save express`。
+- **`--save-dev` 或 `-D`**：
+  - 如果 Express 是开发依赖而不是生产依赖，可以使用 `npm install --save-dev express` 或 `npm i -D express`。
+
+总结来说，`npm i express` 命令会在当前项目中安装 Express 框架，并将其添加到 `package.json` 文件中作为依赖项。
+
+### 3. server.js
+
+```js
+// 导入express模块
+const express = require('express');
+
+// 创建express应用
+const app = express();
+
+// 定义GET路由/person，返回一个虚拟的个人对象
+app.get('/person', (request, response)=>{
+    // 发送一个对象作为响应，包含姓名和年龄
+    response.send({
+        name: 'John',
+        age: 30
+    })
+})
+
+// 启动服务器，监听3000端口
+app.listen(3000, (err) => {
+    // 检查是否有错误
+    if (!err){
+        // 如果没有错误，打印服务器启动信息
+        console.log('Server started on port 3000')
+    }
+});
+```
+
+### 4. 启动服务器
+
+```bash
+node server
+```
+
+打开链接 `[localhost:3000/person](http://localhost:3000/person)`，出现如下界面：
+
+```html
+{
+    "name": "John",
+    "age": 30
+}
+```
+
+### 5. 打开html（静态）
+
+- 新建文件夹`static`
+
+- 创建`demo.html`文件
+
+- 在`server.js`文件中添加
+
+  ```js
+  app.use(express.static(__dirname + '/static'))
+  ```
+
+- 重启服务器
+
+- 打开地址：`[Demo](http://localhost:3000/demo.html)`
+
+- 呈现如下界面：
+
+  <h1>哈哈哈</h1>
+
+> 注意：
+>
+> 如果将demo.html重命名为index.html，则直接访问`http://localhost:3000` 即可呈现上述界面
+
+### 6. 打开html（vue打包）
+
+将`dist`文件夹中的文件统统放入`static`中，重启服务器，访问`http://localhost:3000`即可成功。
+
+> 注意：
+>
+> 在测试过程中，刷新一次页面后，会出现类似`Cannot GET /home/message/detail`错误提示，是因为之前在[13.路由器的两种工作模式](###13.路由器的两种工作模式)部分中设置了history模式，将其设置为hash模式即可解决。
+>
+> 但是地址中还是有 `#`，如果非要用history模式，有解决办法。
+>
+> [connect-history-api-fallback - npm (npmjs.com)](https://www.npmjs.com/package/connect-history-api-fallback) 
+>
+> 1. 在服务器中安装：
+>
+>    ```bash
+>    npm i connect-history-api-fallback
+>    ```
+>
+> 2. 引入
+>
+>    ```js
+>    const history = require('connect-history-api-fallback');
+>    ```
+>
+> 3. 使用
+>
+>    ```js
+>    app.use(history())
+>    ```
+>
+>    必须在`app.use(express.static(__dirname + '/static'))`之前
+>
+> 4. 重新开启服务器
+>
+>    一切正常
+
+## Vue UI组件库
+
+`示例代码`： [40_src_ElementUI](40_src_ElementUI) 
+
+### 1. 移动端常用组件库
+
+- Vant
+- Cube UI
+- Mint UI
+
+### 2. PC端常用组件库
+
+- Element UI: https://element.eleme.cn/#/zh-CN
+- IView UI
 
 
 
